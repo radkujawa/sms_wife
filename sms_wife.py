@@ -42,12 +42,29 @@ def main(args):
 
 def parse_cmdline():
     parser = ArgumentParser()
-    parser.add_argument("--account-sid", type=str, required=True)
-    parser.add_argument("--auth-token", type=str, required=True)
-    parser.add_argument("--wife", type=str, required=True)
-    parser.add_argument("--sender", type=str, required=True)
-    parser.add_argument("--login", type=str, required=True)
-    parser.add_argument("--worktime-url", type=str, required=True)
+    parser.add_argument(
+        "--twilio-account-sid",
+        "--account-sid",
+        type=str,
+        required=True,
+        help="twilio account sid that can be obtained on twilio account at twilio.com",
+    )
+    parser.add_argument(
+        "--twilio-auth-token",
+        "--auth-token",
+        type=str,
+        required=True,
+        help="twilio auth token that can be obtained on twilio account at twilio.com",
+    )
+    parser.add_argument(
+        "--twilio-sender",
+        type=str,
+        required=True,
+        help="phone number that is registered as sender at twilio account (that with sid and token)",
+    )
+    parser.add_argument("--wife", type=str, required=True, help="actual number to your wife")
+    parser.add_argument("--login", type=str, required=True, help="worktime login")
+    parser.add_argument("--worktime-url", type=str, required=True, help="full url to worktime internal service")
     parser.add_argument("sms_content", metavar="SMS")
     return parser.parse_args()
 
