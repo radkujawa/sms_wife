@@ -36,8 +36,8 @@ def main(args):
         if previous_status == PRESENT:
             (cmd.echo[ABSENT] > ATTENDANCE_FILE)()
             print(f"{pretty_now} Sending SMS with changing status notification", file=sys.stderr)
-            client = Client(args.account_sid, args.auth_token)
-            client.messages.create(from_=args.sender, body=f"{pretty_now} {args.sms_content}", to=args.wife)
+            client = Client(args.twilio_account_sid, args.twilio_auth_token)
+            client.messages.create(from_=args.twilio_sender, body=f"{pretty_now} {args.sms_content}", to=args.wife)
 
 
 def parse_cmdline():
