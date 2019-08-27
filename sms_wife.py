@@ -58,6 +58,7 @@ def parse_cmdline():
     )
     parser.add_argument(
         "--twilio-sender",
+        "--sender",
         type=str,
         required=True,
         help="phone number that is registered as sender at twilio account (that with sid and token)",
