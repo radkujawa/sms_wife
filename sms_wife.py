@@ -1,12 +1,12 @@
+import datetime
 import re
 import sys
+import time
 from argparse import ArgumentParser
 
 import requests
-import datetime, time
 from plumbum import cmd
 from twilio.rest import Client
-
 
 PRESENT = "present"
 ABSENT = "absent"
@@ -14,7 +14,16 @@ ATTENDANCE_FILE = "/tmp/attendance"
 WORKTIME_URL_FORMAT = "{worktime_url}/json?userName={user}&action=GETATTENDANCE"
 
 
+def send_sms(args, body):
+    client = Client(args.twilio_account_sid, args.twilio_auth_token)
+    client.messages.create(from_=args.twilio_sender, body=body, to=args.wife)
+
+
 def main(args):
+
+    if args.force:
+        send_sms(args, args.sms_content)
+        return
 
     resp = requests.get(WORKTIME_URL_FORMAT.format(user=args.login, worktime_url=args.worktime_url))
     users = str(resp.content).split("\\n")
@@ -36,8 +45,7 @@ def main(args):
         if previous_status == PRESENT:
             (cmd.echo[ABSENT] > ATTENDANCE_FILE)()
             print(f"{pretty_now} Sending SMS with changing status notification", file=sys.stderr)
-            client = Client(args.twilio_account_sid, args.twilio_auth_token)
-            client.messages.create(from_=args.twilio_sender, body=f"{pretty_now} {args.sms_content}", to=args.wife)
+            send_sms(args, f"{pretty_now} {args.sms_content}")
 
 
 def parse_cmdline():
@@ -62,6 +70,9 @@ def parse_cmdline():
         type=str,
         required=True,
         help="phone number that is registered as sender at twilio account (that with sid and token)",
+    )
+    parser.add_argument(
+        "--force", action="store_true", default=False, help="send sms unconditionally (even if at work)"
     )
     parser.add_argument("--wife", type=str, required=True, help="actual number to your wife")
     parser.add_argument("--login", type=str, required=True, help="worktime login")
